@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, KeyRound, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, KeyRound, Check, Loader2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ interface SettingsStatus {
   worldtidesApiKey: string;
   hasStormglass: boolean;
   hasWorldtides: boolean;
+  persistent: boolean;
 }
 
 export function SettingsForm() {
@@ -70,6 +71,17 @@ export function SettingsForm() {
         </div>
       </header>
 
+      {status && !status.persistent && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>
+            Bu deploy sunucusuz (ör. Vercel) bir ortamda çalışıyor — buradan kaydedilen anahtarlar
+            kalıcı olmaz. Bunun yerine proje ayarlarına <strong>STORMGLASS_API_KEY</strong> veya{" "}
+            <strong>WORLDTIDES_API_KEY</strong> ortam değişkenini ekle.
+          </p>
+        </div>
+      )}
+
       <form
         onSubmit={handleSave}
         className="flex flex-col gap-4 rounded-2xl border border-abyss-600 bg-abyss-900/80 p-5"
@@ -77,7 +89,10 @@ export function SettingsForm() {
         <p className="text-sm text-slate-400">
           Aşağıdakilerden <strong className="text-slate-200">sadece birini</strong> doldurman
           yeterli. Hiçbiri girilmezse uygulama matematiksel sinüs dalgası simülasyonuyla (mock)
-          çalışmaya devam eder. Anahtarlar bu cihazda yerel bir dosyada saklanır.
+          çalışmaya devam eder.{" "}
+          {status?.persistent
+            ? "Anahtarlar bu cihazda yerel bir dosyada saklanır."
+            : "Bu ortamda anahtar kaydetme devre dışı — yukarıdaki notu okuyun."}
         </p>
 
         <label className="flex flex-col gap-1.5">
@@ -93,8 +108,9 @@ export function SettingsForm() {
             type="password"
             value={stormglassApiKey}
             onChange={(e) => setStormglassApiKey(e.target.value)}
+            disabled={status ? !status.persistent : false}
             placeholder={status?.hasStormglass ? "Değiştirmek için yeni anahtar gir" : "sg_xxxxxxxx"}
-            className="rounded-xl border border-abyss-600 bg-abyss-800/80 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-tide-in/60"
+            className="rounded-xl border border-abyss-600 bg-abyss-800/80 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-tide-in/60 disabled:opacity-50"
           />
         </label>
 
@@ -111,8 +127,9 @@ export function SettingsForm() {
             type="password"
             value={worldtidesApiKey}
             onChange={(e) => setWorldtidesApiKey(e.target.value)}
+            disabled={status ? !status.persistent : false}
             placeholder={status?.hasWorldtides ? "Değiştirmek için yeni anahtar gir" : "wt_xxxxxxxx"}
-            className="rounded-xl border border-abyss-600 bg-abyss-800/80 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-tide-in/60"
+            className="rounded-xl border border-abyss-600 bg-abyss-800/80 px-4 py-3 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-tide-in/60 disabled:opacity-50"
           />
         </label>
 
@@ -124,7 +141,7 @@ export function SettingsForm() {
 
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || (status ? !status.persistent : false)}
           className={cn(
             "flex items-center justify-center gap-2 rounded-xl border border-tide-in/50 bg-tide-in/10 px-4 py-3 text-sm font-semibold text-tide-in transition hover:bg-tide-in/20 disabled:opacity-60"
           )}
