@@ -11,8 +11,10 @@ next-env.d.ts
 public/sw.js
 public/workbox-*.js
 public/worker-*.js
+public/swe-worker-*.js
 public/sw.js.map
 public/workbox-*.js.map
+public/swe-worker-*.js.map
 .DS_Store
 Thumbs.db
 npm-debug.log*
